@@ -15,6 +15,7 @@ export interface LoanRequest {
   estado: LoanState;
   data: string;
   analista: string;
+  filial: string;
   finalidade: string;
   taxaJuros: number;
   parcelaEstimada: number;
@@ -28,6 +29,14 @@ export const analistas = [
   "Bruno Chissano",
   "Carla Mahumane",
   "Daniel Sitoe",
+];
+
+export const filiais = [
+  "Maputo - Sede",
+  "Matola",
+  "Beira",
+  "Nampula",
+  "Xai-Xai",
 ];
 
 export const loanStateLabel: Record<LoanState, string> = {
