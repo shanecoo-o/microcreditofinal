@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDateTime, formatMZN } from "../utils/format";
 import { loans, loanStatusLabel, loanStatusStyle, scoreStyle } from "../mock/loans";
+import { WorkflowTimeline } from "../components/WorkflowTimeline";
 
 type ActionType = "approve" | "reject" | "correction";
 
@@ -210,7 +211,7 @@ export default function LoanDetail() {
           <TabsTrigger value="cliente">Cliente</TabsTrigger>
           <TabsTrigger value="documentos">Documentos</TabsTrigger>
           <TabsTrigger value="garantias">Garantias</TabsTrigger>
-          <TabsTrigger value="historico">Histórico</TabsTrigger>
+          <TabsTrigger value="historico">Workflow</TabsTrigger>
           <TabsTrigger value="score">Score</TabsTrigger>
           <TabsTrigger value="observacoes">Observações</TabsTrigger>
         </TabsList>
@@ -315,24 +316,7 @@ export default function LoanDetail() {
         </TabsContent>
 
         <TabsContent value="historico">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Histórico do processo</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="relative border-l border-border ml-2 space-y-4">
-                {request.historico.map((h, idx) => (
-                  <li key={idx} className="ml-4">
-                    <span className="absolute -left-1.5 h-3 w-3 rounded-full bg-primary" />
-                    <p className="text-sm font-medium">{h.evento}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatDateTime(h.data)} · {h.autor}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
+          <WorkflowTimeline loan={request} />
         </TabsContent>
 
         <TabsContent value="score">
