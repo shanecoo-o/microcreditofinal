@@ -211,7 +211,7 @@ export default function LoanDetail() {
           <TabsTrigger value="cliente">Cliente</TabsTrigger>
           <TabsTrigger value="documentos">Documentos</TabsTrigger>
           <TabsTrigger value="garantias">Garantias</TabsTrigger>
-          <TabsTrigger value="historico">Histórico</TabsTrigger>
+          <TabsTrigger value="historico">Workflow</TabsTrigger>
           <TabsTrigger value="score">Score</TabsTrigger>
           <TabsTrigger value="observacoes">Observações</TabsTrigger>
         </TabsList>
