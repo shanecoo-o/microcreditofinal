@@ -35,6 +35,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { formatDateTime, formatMZN } from "../utils/format";
 import { loans, loanStatusLabel, loanStatusStyle, scoreStyle } from "../mock/loans";
+import { WorkflowTimeline } from "../components/WorkflowTimeline";
 
 type ActionType = "approve" | "reject" | "correction";
 
