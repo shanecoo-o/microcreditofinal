@@ -1,6 +1,8 @@
 export type LoanStatus =
   | "SUBMITTED"
   | "UNDER_REVIEW"
+  | "DOCUMENT_PENDING"
+  | "GUARANTEE_REVIEW"
   | "APPROVED"
   | "REJECTED"
   | "CONTRACT_PENDING"
@@ -22,7 +24,13 @@ export interface Loan {
   finalidade: string;
   bi: string;
   endereco: string;
-  historico: { data: string; evento: string; autor: string }[];
+  historico: {
+    data: string;
+    evento: string;
+    autor: string;
+    estado?: LoanStatus;
+    observacao?: string;
+  }[];
 }
 
 export const loanAnalistas = [
@@ -36,6 +44,8 @@ export const loanAnalistas = [
 export const loanStatusLabel: Record<LoanStatus, string> = {
   SUBMITTED: "Submetido",
   UNDER_REVIEW: "Em análise",
+  DOCUMENT_PENDING: "Documentos pendentes",
+  GUARANTEE_REVIEW: "Análise de garantia",
   APPROVED: "Aprovado",
   REJECTED: "Rejeitado",
   CONTRACT_PENDING: "Contrato pendente",
@@ -45,6 +55,8 @@ export const loanStatusLabel: Record<LoanStatus, string> = {
 export const loanStatusStyle: Record<LoanStatus, string> = {
   SUBMITTED: "bg-muted text-foreground hover:bg-muted",
   UNDER_REVIEW: "bg-accent/15 text-accent hover:bg-accent/15",
+  DOCUMENT_PENDING: "bg-warning/15 text-warning hover:bg-warning/15",
+  GUARANTEE_REVIEW: "bg-accent/15 text-accent hover:bg-accent/15",
   APPROVED: "bg-primary/10 text-primary hover:bg-primary/10",
   REJECTED: "bg-destructive/15 text-destructive hover:bg-destructive/15",
   CONTRACT_PENDING: "bg-warning/15 text-warning hover:bg-warning/15",
