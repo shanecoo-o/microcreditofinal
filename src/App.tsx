@@ -31,6 +31,14 @@ const LoanRequests = lazy(() => import("./app/pages/LoanRequests"));
 const LoanRequestDetail = lazy(() => import("./app/pages/LoanRequestDetail"));
 const Loans = lazy(() => import("./app/pages/Loans"));
 const LoanDetail = lazy(() => import("./app/pages/LoanDetail"));
+const Operations = lazy(() => import("./app/pages/Operations"));
+const Clients = lazy(() => import("./app/pages/Clients"));
+const ClientDetail = lazy(() => import("./app/pages/ClientDetail"));
+const LoanManagement = lazy(() => import("./app/pages/LoanManagement"));
+const Guarantees = lazy(() => import("./app/pages/Guarantees"));
+const Contracts = lazy(() => import("./app/pages/Contracts"));
+const Finance = lazy(() => import("./app/pages/Finance"));
+const Collections = lazy(() => import("./app/pages/Collections"));
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 30_000, refetchOnWindowFocus: false } },
@@ -70,6 +78,14 @@ const App = () => (
                         <Route path="admin/dashboard" element={<AdminDashboard />} />
                         <Route path="admin/loan-requests" element={<LoanRequests />} />
                         <Route path="admin/loan-requests/:processo" element={<LoanRequestDetail />} />
+                        <Route path="admin/operations" element={<Operations />} />
+                        <Route path="admin/clients" element={<Clients />} />
+                        <Route path="admin/clients/:id" element={<ClientDetail />} />
+                        <Route path="admin/loans" element={<LoanManagement />} />
+                        <Route path="admin/guarantees" element={<Guarantees />} />
+                        <Route path="admin/contracts" element={<Contracts />} />
+                        <Route path="admin/finance" element={<Finance />} />
+                        <Route path="admin/collections" element={<Collections />} />
                         <Route path="admin/reports" element={<Reports />} />
                         <Route path="admin/audit" element={<Audit />} />
                       </Route>
