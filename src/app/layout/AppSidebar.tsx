@@ -13,6 +13,13 @@ import {
   UserCircle2,
   Users,
   Wallet,
+  Banknote,
+  Building2,
+  HandCoins,
+  LayoutGrid,
+  PhoneCall,
+  ShieldCheck,
+  UsersRound,
 } from "lucide-react";
 import {
   Sidebar,
@@ -46,14 +53,29 @@ const userItems: Item[] = [
   { to: "/app/profile", label: "Perfil", icon: UserCircle2 },
 ];
 
-const adminItems: Item[] = [
-  { to: "/app/admin/dashboard", label: "Dashboard Admin", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
+const operacaoItems: Item[] = [
+  { to: "/app/admin/dashboard", label: "Dashboard Executivo", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
+  { to: "/app/admin/operations", label: "Centro de Operações", icon: LayoutGrid, roles: ["ADMIN", "MANAGER"] },
   { to: "/app/admin/loan-requests", label: "Solicitações", icon: FileSignature, roles: ["ADMIN", "MANAGER"] },
+];
+
+const gestaoItems: Item[] = [
+  { to: "/app/admin/clients", label: "Clientes", icon: UsersRound, roles: ["ADMIN", "MANAGER"] },
+  { to: "/app/admin/loans", label: "Empréstimos", icon: HandCoins, roles: ["ADMIN", "MANAGER"] },
+  { to: "/app/admin/guarantees", label: "Garantias", icon: ShieldCheck, roles: ["ADMIN", "MANAGER"] },
+  { to: "/app/admin/contracts", label: "Contratos", icon: Building2, roles: ["ADMIN", "MANAGER"] },
+];
+
+const financeiroItems: Item[] = [
+  { to: "/app/admin/finance", label: "Financeiro", icon: Banknote, roles: ["ADMIN", "MANAGER"] },
+  { to: "/app/admin/collections", label: "Cobrança", icon: PhoneCall, roles: ["ADMIN", "MANAGER"] },
+];
+
+const adminItems: Item[] = [
   { to: "/app/admin/users", label: "Utilizadores", icon: Users, roles: ["ADMIN", "MANAGER", "SUPPORT"] },
   { to: "/app/admin/roles", label: "Roles", icon: Shield, roles: ["ADMIN"] },
   { to: "/app/admin/permissions", label: "Permissões", icon: KeyRound, roles: ["ADMIN"] },
   { to: "/app/admin/audit", label: "Auditoria", icon: ScrollText, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/reports", label: "Relatórios", icon: FileText, roles: ["ADMIN", "MANAGER"] },
   { to: "/app/admin/settings", label: "Configurações", icon: Settings, roles: ["ADMIN"] },
 ];
 
@@ -63,7 +85,11 @@ export function AppSidebar() {
   const { user, hasRole } = useAuth();
   const { pathname } = useLocation();
 
-  const visibleAdmin = adminItems.filter((i) => !i.roles || hasRole(i.roles));
+  const visible = (items: Item[]) => items.filter((i) => !i.roles || hasRole(i.roles));
+  const visibleOps = visible(operacaoItems);
+  const visibleGestao = visible(gestaoItems);
+  const visibleFin = visible(financeiroItems);
+  const visibleAdmin = visible(adminItems);
 
   const renderItem = (i: Item) => {
     const active = pathname === i.to;
@@ -102,6 +128,33 @@ export function AppSidebar() {
             <SidebarMenu>{userItems.map(renderItem)}</SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {visibleOps.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Operação</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{visibleOps.map(renderItem)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {visibleGestao.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Gestão</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{visibleGestao.map(renderItem)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {visibleFin.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Financeiro</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{visibleFin.map(renderItem)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {visibleAdmin.length > 0 && (
           <SidebarGroup>
