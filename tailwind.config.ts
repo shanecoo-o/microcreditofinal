@@ -2,17 +2,12 @@ import type { Config } from "tailwindcss";
 
 export default {
   darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ["./src/**/*.{ts,tsx}"],
   prefix: "",
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1.5rem",
       screens: {
         "2xl": "1400px",
       },
@@ -62,10 +57,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        trust: {
-          blue: "hsl(var(--trust-blue))",
-          "blue-dark": "hsl(var(--trust-blue-dark))",
-          "blue-light": "hsl(var(--trust-blue-light))",
+        jcf: {
+          "deep-navy": "hsl(var(--jcf-deep-navy))",
+          navy: "hsl(var(--jcf-navy))",
+          royal: "hsl(var(--jcf-royal))",
+          action: "hsl(var(--jcf-action))",
+          ice: "hsl(var(--jcf-ice))",
         },
         success: {
           DEFAULT: "hsl(var(--success))",
@@ -75,18 +72,34 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
-        info: "hsl(var(--info))",
-        "success-green": "hsl(var(--success-green))",
-        "warning-orange": "hsl(var(--warning-orange))",
+        danger: {
+          DEFAULT: "hsl(var(--danger))",
+          foreground: "hsl(var(--danger-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        pending: {
+          DEFAULT: "hsl(var(--pending))",
+          foreground: "hsl(var(--pending-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 2px)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Poppins", "system-ui", "sans-serif"],
+        sans: ["Manrope", "system-ui", "sans-serif"],
+        institutional: ["Source Serif 4", "Georgia", "serif"],
+      },
+      boxShadow: {
+        sm: "0 1px 2px 0 hsl(var(--jcf-deep-navy) / 0.05)",
+        DEFAULT: "0 1px 3px 0 hsl(var(--jcf-deep-navy) / 0.07)",
+        md: "0 2px 6px -1px hsl(var(--jcf-deep-navy) / 0.08)",
+        lg: "0 6px 16px -4px hsl(var(--jcf-deep-navy) / 0.10)",
       },
       keyframes: {
         "accordion-down": {
@@ -98,26 +111,16 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          "0%": { opacity: "0", transform: "translateY(10px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        "fade-in-up": {
-          "0%": { opacity: "0", transform: "translateY(20px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
-        float: {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "fade-in-up": "fade-in-up 0.6s ease-out forwards",
-        float: "float 6s ease-in-out infinite",
+        "fade-in": "fade-in 0.25s ease-out forwards",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
