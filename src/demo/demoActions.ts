@@ -13,7 +13,7 @@ import { buildSchedule, simulateCredit } from "@/domain/simulation";
 
 /* ============ Utilitários internos ============ */
 
-function pushTimeline(
+export function pushTimeline(
   data: DemoData,
   subjectId: string,
   entry: {
@@ -39,7 +39,7 @@ function pushTimeline(
   ];
 }
 
-function pushAudit(
+export function pushAudit(
   data: DemoData,
   entry: { actor: string; action: string; module: string; detail?: string },
 ): DemoData["audit"] {
@@ -57,7 +57,7 @@ function pushAudit(
   ];
 }
 
-function pushNotification(
+export function pushNotification(
   data: DemoData,
   entry: {
     title: string;
@@ -466,7 +466,7 @@ export function cancelAppointment(appointmentId: string, reason?: string) {
 
 /* ============ Decisão, contrato e desembolso ============ */
 
-function setApplication(
+export function setApplication(
   data: DemoData,
   applicationId: string,
   patch: Partial<LoanApplication>,
