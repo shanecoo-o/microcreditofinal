@@ -1,7 +1,15 @@
-import { Bell, LogOut, Search } from "lucide-react";
+import { Bell, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { GlobalSearch } from "./GlobalSearch";
+import { useDemoStore } from "@/demo/DemoDataProvider";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -19,7 +27,8 @@ import { notificationsApi } from "../api/client";
 import { Badge } from "@/components/ui/badge";
 
 export function Topbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, branchId, setBranchId } = useAuth();
+  const branches = useDemoStore().branches;
   const navigate = useNavigate();
   const { data: notifications = [] } = useQuery({
     queryKey: ["notifications"],
@@ -37,10 +46,22 @@ export function Topbar() {
   return (
     <header className="h-14 border-b border-border bg-card/50 backdrop-blur sticky top-0 z-30 flex items-center gap-2 px-3 sm:px-4">
       <SidebarTrigger />
-      <div className="hidden md:flex items-center relative flex-1 max-w-md">
-        <Search className="absolute left-3 h-4 w-4 text-muted-foreground pointer-events-none" />
-        <Input placeholder="Pesquisar..." className="pl-9 h-9" />
+      <div className="hidden md:flex items-center flex-1 max-w-md">
+        <GlobalSearch />
       </div>
+      {branches.length > 1 && user?.role !== "USER" && (
+        <Select value={branchId ?? "TODAS"} onValueChange={(v) => setBranchId(v === "TODAS" ? undefined : v)}>
+          <SelectTrigger className="hidden lg:flex h-9 w-[190px]" aria-label="Agência activa">
+            <SelectValue placeholder="Agência" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="TODAS">Todas as agências</SelectItem>
+            {branches.map((b) => (
+              <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       <div className="flex-1 md:hidden" />
       <div className="flex items-center gap-1">
         <ThemeToggle />
