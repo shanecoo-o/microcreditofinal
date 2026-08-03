@@ -45,7 +45,7 @@ export default function Login() {
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
     try {
-      const user = await login(data.email, data.password, tab);
+      const user = await login(data.email, data.password);
       toast.success(`Bem-vindo, ${user.name}`);
       const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
       navigate(from ?? (user.role === "USER" ? "/app/dashboard" : "/app/admin/dashboard"), {

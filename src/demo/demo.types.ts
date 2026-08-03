@@ -87,6 +87,18 @@ export type ApplicationStatus =
 
 export type RiskLevel = "BAIXO" | "MEDIO" | "ALTO";
 
+/** Etapas do pipeline operacional (Centro de Operações). */
+export type OpsStage =
+  | "NOVOS"
+  | "DOCUMENTOS"
+  | "VERIFICACAO"
+  | "ANALISE"
+  | "APROVACAO"
+  | "CONTRATO"
+  | "DESEMBOLSO";
+
+export type Priority = "ALTA" | "MEDIA" | "BAIXA";
+
 export interface LoanApplication {
   id: string;
   processId: string;
@@ -108,6 +120,11 @@ export interface LoanApplication {
   updatedAt: string;
   reference: string;
   loanId?: string;
+  /** Etapa operacional; quando ausente é derivada do estado. */
+  stage?: OpsStage;
+  priority?: Priority;
+  /** Data limite de SLA da etapa actual. */
+  slaDueAt?: string;
 }
 
 export type DocumentStatus = "PENDENTE" | "EM_REVISAO" | "VALIDADO" | "REJEITADO";
@@ -183,7 +200,17 @@ export type AppointmentService =
 
 export type AppointmentMode = "PRESENCIAL" | "ONLINE" | "TELEFONE";
 
-export type AppointmentStatus = "CONFIRMADA" | "REMARCADA" | "CANCELADA" | "REALIZADA";
+export type AppointmentStatus =
+  | "AGUARDA_CONFIRMACAO"
+  | "CONFIRMADA"
+  | "EM_ESPERA"
+  | "EM_ATENDIMENTO"
+  | "REALIZADA"
+  | "NAO_COMPARECEU"
+  | "CANCELADA"
+  | "REMARCADA"
+  | "EXPIRADA"
+  | "TRANSFERIDA";
 
 export interface Appointment {
   id: string;
@@ -235,11 +262,18 @@ export interface Disbursement {
   contractId: string;
   amount: number;
   method: "TRANSFERENCIA" | "CARTEIRA_MOVEL" | "BALCAO";
-  status: "PREPARADO" | "AUTORIZADO" | "EXECUTADO" | "PENDENTE";
+  status: "PENDENTE" | "PREPARADO" | "AUTORIZADO" | "PROCESSANDO" | "EXECUTADO" | "FALHADO";
   preparedAt?: string;
   authorizedAt?: string;
   executedAt?: string;
   authorizedById?: string;
+  preparedById?: string;
+  /** Referência demonstrativa do desembolso (ex.: DSB-DEMO-2026-00124). */
+  reference?: string;
+  /** Canal demonstrativo: M-Pesa, e-Mola, transferência, numerário. */
+  channel?: string;
+  /** Destino demonstrativo (número de carteira ou conta). */
+  destination?: string;
 }
 
 export type LoanStatus = "ACTIVO" | "LIQUIDADO" | "EM_ATRASO" | "RENEGOCIADO";
@@ -284,6 +318,9 @@ export interface Payment {
   status: "CONFIRMADO_DEMO";
   createdAt: string;
   receiptId: string;
+  /** Reconciliação demonstrativa. */
+  reconciled?: boolean;
+  reconciledAt?: string;
 }
 
 export interface Receipt {
@@ -356,4 +393,40 @@ export interface DemoData {
   notifications: Notification[];
   timeline: TimelineEvent[];
   audit: AuditEvent[];
+  /** Registos de cobrança (opcionais em sessões demo antigas). */
+  collectionContacts?: CollectionContact[];
+  paymentPromises?: PaymentPromise[];
+  slotBlocks?: SlotBlock[];
+}
+
+export interface CollectionContact {
+  id: string;
+  loanId: string;
+  clientId: string;
+  channel: "TELEFONE" | "SMS" | "VISITA" | "WHATSAPP";
+  outcome: string;
+  note?: string;
+  agentId: string;
+  createdAt: string;
+}
+
+export interface PaymentPromise {
+  id: string;
+  loanId: string;
+  clientId: string;
+  amount: number;
+  promisedDate: string;
+  status: "ACTIVA" | "CUMPRIDA" | "INCUMPRIDA";
+  agentId: string;
+  createdAt: string;
+}
+
+export interface SlotBlock {
+  id: string;
+  date: string;
+  time: string;
+  branchId: string;
+  consultantId: string;
+  reason: string;
+  createdAt: string;
 }

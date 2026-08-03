@@ -13,7 +13,7 @@ import { buildSchedule, simulateCredit } from "@/domain/simulation";
 
 /* ============ Utilitários internos ============ */
 
-function pushTimeline(
+export function pushTimeline(
   data: DemoData,
   subjectId: string,
   entry: {
@@ -39,7 +39,7 @@ function pushTimeline(
   ];
 }
 
-function pushAudit(
+export function pushAudit(
   data: DemoData,
   entry: { actor: string; action: string; module: string; detail?: string },
 ): DemoData["audit"] {
@@ -57,7 +57,7 @@ function pushAudit(
   ];
 }
 
-function pushNotification(
+export function pushNotification(
   data: DemoData,
   entry: {
     title: string;
@@ -466,7 +466,7 @@ export function cancelAppointment(appointmentId: string, reason?: string) {
 
 /* ============ Decisão, contrato e desembolso ============ */
 
-function setApplication(
+export function setApplication(
   data: DemoData,
   applicationId: string,
   patch: Partial<LoanApplication>,
@@ -540,7 +540,10 @@ export function prepareContract(applicationId: string) {
     const contract = {
       id: nextId("CTR", data.contracts),
       applicationId,
-      reference: `CTR-${app.processId.replace("PRC-", "")}`,
+      reference:
+        app.processId === "PRC-2026-00051"
+          ? "CTR-2026-00089"
+          : `CTR-${app.processId.replace("PRC-", "")}`,
       status: "PREPARADO" as const,
       amount,
       termMonths: app.termMonths,
@@ -615,10 +618,20 @@ export function markContractSigned(contractId: string) {
   });
 }
 
-export function prepareDisbursement(contractId: string, method: "TRANSFERENCIA" | "CARTEIRA_MOVEL" | "BALCAO" = "CARTEIRA_MOVEL") {
+export function prepareDisbursement(
+  contractId: string,
+  method: "TRANSFERENCIA" | "CARTEIRA_MOVEL" | "BALCAO" = "CARTEIRA_MOVEL",
+  options: { channel?: string; destination?: string; preparedById?: string } = {},
+) {
   demoStore.update((data) => {
     const contract = data.contracts.find((c) => c.id === contractId);
     if (!contract) return data;
+    const app = data.applications.find((a) => a.id === contract.applicationId);
+    const client = data.clients.find((c) => c.id === app?.clientId);
+    const isMain = app?.processId === "PRC-2026-00051";
+    const reference = isMain
+      ? "DSB-DEMO-2026-00124"
+      : `DSB-DEMO-${new Date().getFullYear()}-${String(124 + data.disbursements.length).padStart(5, "0")}`;
 
     return {
       ...data,
@@ -632,6 +645,10 @@ export function prepareDisbursement(contractId: string, method: "TRANSFERENCIA" 
           method,
           status: "PREPARADO" as const,
           preparedAt: nowIso(),
+          preparedById: options.preparedById ?? "USR-005",
+          reference,
+          channel: options.channel ?? (method === "CARTEIRA_MOVEL" ? "M-Pesa — demonstração" : method === "TRANSFERENCIA" ? "Transferência bancária — demonstração" : "Numerário — demonstração"),
+          destination: options.destination ?? client?.phone ?? "—",
         },
       ],
       timeline: pushTimeline(data, contract.applicationId, {
@@ -649,7 +666,7 @@ export function prepareDisbursement(contractId: string, method: "TRANSFERENCIA" 
   });
 }
 
-export function authorizeDisbursement(disbursementId: string) {
+export function authorizeDisbursement(disbursementId: string, authorizedById = "USR-005") {
   demoStore.update((data) => {
     const disb = data.disbursements.find((d) => d.id === disbursementId);
     if (!disb) return data;
@@ -657,7 +674,7 @@ export function authorizeDisbursement(disbursementId: string) {
       ...data,
       disbursements: data.disbursements.map((d) =>
         d.id === disbursementId
-          ? { ...d, status: "AUTORIZADO" as const, authorizedAt: nowIso(), authorizedById: "USR-005" }
+          ? { ...d, status: "AUTORIZADO" as const, authorizedAt: nowIso(), authorizedById }
           : d,
       ),
       timeline: pushTimeline(data, disb.applicationId, {
@@ -809,7 +826,18 @@ export function simulatePayment(
 
     const paymentId = nextId("PAY", data.payments);
     receiptId = nextId("REC", data.receipts);
-    const receiptNumber = `RC-${String(data.receipts.length + 1).padStart(5, "0")}`;
+    const isMainLoan = data.applications.some(
+      (a) => a.id === loan.applicationId && a.processId === "PRC-2026-00051",
+    );
+    const firstOfLoan = !data.payments.some((p) => p.loanId === loanId);
+    const paymentReference =
+      isMainLoan && firstOfLoan
+        ? "PAY-DEMO-2026-00451"
+        : `PAY-DEMO-${new Date().getFullYear()}-${String(451 + data.payments.length).padStart(5, "0")}`;
+    const receiptNumber =
+      isMainLoan && firstOfLoan
+        ? "REC-DEMO-2026-00451"
+        : `REC-DEMO-${new Date().getFullYear()}-${String(451 + data.receipts.length).padStart(5, "0")}`;
 
     const allPaid = updatedInstallments
       .filter((i) => i.loanId === loanId)
@@ -834,7 +862,7 @@ export function simulatePayment(
           installmentId: target?.id,
           amount,
           method,
-          reference: `PGD-${receiptNumber}`,
+          reference: paymentReference,
           status: "CONFIRMADO_DEMO" as const,
           createdAt: nowIso(),
           receiptId,

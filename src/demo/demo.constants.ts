@@ -150,11 +150,35 @@ export const APPOINTMENT_MODES: {
 ];
 
 export const APPOINTMENT_STATUS_LABEL: Record<AppointmentStatus, string> = {
+  AGUARDA_CONFIRMACAO: "Aguarda confirmação",
   CONFIRMADA: "Confirmada",
-  REMARCADA: "Remarcada",
+  EM_ESPERA: "Em espera",
+  EM_ATENDIMENTO: "Em atendimento",
+  REALIZADA: "Concluída",
+  NAO_COMPARECEU: "Não compareceu",
   CANCELADA: "Cancelada",
-  REALIZADA: "Realizada",
+  REMARCADA: "Remarcada",
+  EXPIRADA: "Expirada",
+  TRANSFERIDA: "Transferida",
 };
+
+export const OPS_STAGES: { key: import("./demo.types").OpsStage; label: string }[] = [
+  { key: "NOVOS", label: "Novos" },
+  { key: "DOCUMENTOS", label: "Documentos" },
+  { key: "VERIFICACAO", label: "Verificação" },
+  { key: "ANALISE", label: "Análise" },
+  { key: "APROVACAO", label: "Aprovação" },
+  { key: "CONTRATO", label: "Contrato" },
+  { key: "DESEMBOLSO", label: "Desembolso" },
+];
+
+export const PRIORITY_LABEL = { ALTA: "Alta", MEDIA: "Média", BAIXA: "Baixa" } as const;
+
+export const DISBURSEMENT_METHODS = [
+  { code: "CARTEIRA_MOVEL", label: "M-Pesa / e-Mola" },
+  { code: "TRANSFERENCIA", label: "Transferência bancária" },
+  { code: "BALCAO", label: "Numerário ao balcão" },
+] as const;
 
 export const APPOINTMENT_TIMES = [
   "08:30",
