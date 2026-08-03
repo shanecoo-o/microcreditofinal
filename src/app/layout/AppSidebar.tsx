@@ -1,27 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  BarChart3,
-  Bell,
-  FileText,
-  FileSignature,
-  History,
-  KeyRound,
-  LayoutDashboard,
-  ScrollText,
-  Settings,
-  Shield,
-  UserCircle2,
-  Users,
-  Wallet,
-  Banknote,
-  Building2,
-  HandCoins,
-  LayoutGrid,
-  PhoneCall,
-  ShieldCheck,
-  UsersRound,
-} from "lucide-react";
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -35,69 +13,27 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuth } from "../auth/AuthContext";
-import type { Role } from "../types";
-
-interface Item {
-  to: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  roles?: Role[];
-}
-
-const userItems: Item[] = [
-  { to: "/app/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/app/wallet", label: "Carteira", icon: Wallet },
-  { to: "/app/transactions", label: "Transações", icon: History },
-  { to: "/app/loans", label: "Solicitações de Crédito", icon: FileSignature },
-  { to: "/app/notifications", label: "Notificações", icon: Bell },
-  { to: "/app/profile", label: "Perfil", icon: UserCircle2 },
-];
-
-const operacaoItems: Item[] = [
-  { to: "/app/admin/dashboard", label: "Dashboard Executivo", icon: BarChart3, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/operations", label: "Centro de Operações", icon: LayoutGrid, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/loan-requests", label: "Solicitações", icon: FileSignature, roles: ["ADMIN", "MANAGER"] },
-];
-
-const gestaoItems: Item[] = [
-  { to: "/app/admin/clients", label: "Clientes", icon: UsersRound, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/loans", label: "Empréstimos", icon: HandCoins, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/guarantees", label: "Garantias", icon: ShieldCheck, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/contracts", label: "Contratos", icon: Building2, roles: ["ADMIN", "MANAGER"] },
-];
-
-const financeiroItems: Item[] = [
-  { to: "/app/admin/finance", label: "Financeiro", icon: Banknote, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/collections", label: "Cobrança", icon: PhoneCall, roles: ["ADMIN", "MANAGER"] },
-];
-
-const adminItems: Item[] = [
-  { to: "/app/admin/users", label: "Utilizadores", icon: Users, roles: ["ADMIN", "MANAGER", "SUPPORT"] },
-  { to: "/app/admin/roles", label: "Roles", icon: Shield, roles: ["ADMIN"] },
-  { to: "/app/admin/permissions", label: "Permissões", icon: KeyRound, roles: ["ADMIN"] },
-  { to: "/app/admin/audit", label: "Auditoria", icon: ScrollText, roles: ["ADMIN", "MANAGER"] },
-  { to: "/app/admin/settings", label: "Configurações", icon: Settings, roles: ["ADMIN"] },
-];
+import { CLIENT_NAV, NAV_GROUPS, type NavItem } from "./navigation";
+import { PERFIL_LABEL } from "@/demo/demo.constants";
+import { NAV_ICONS } from "./navIcons";
 
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const { user, hasRole } = useAuth();
+  const { user } = useAuth();
   const { pathname } = useLocation();
 
-  const visible = (items: Item[]) => items.filter((i) => !i.roles || hasRole(i.roles));
-  const visibleOps = visible(operacaoItems);
-  const visibleGestao = visible(gestaoItems);
-  const visibleFin = visible(financeiroItems);
-  const visibleAdmin = visible(adminItems);
+  const allowed = (i: NavItem) => !!user && i.roles.includes(user.role);
+  const isClient = user?.role === "USER";
 
-  const renderItem = (i: Item) => {
-    const active = pathname === i.to;
+  const renderItem = (i: NavItem) => {
+    const Icon = NAV_ICONS[i.to] ?? NAV_ICONS.default;
+    const active = pathname === i.to || pathname.startsWith(`${i.to}/`);
     return (
       <SidebarMenuItem key={i.to}>
         <SidebarMenuButton asChild isActive={active} tooltip={i.label}>
           <NavLink to={i.to} className="flex items-center gap-3">
-            <i.icon className="h-4 w-4 shrink-0" />
+            <Icon className="h-4 w-4 shrink-0" />
             {!collapsed && <span className="truncate">{i.label}</span>}
           </NavLink>
         </SidebarMenuButton>
@@ -105,74 +41,57 @@ export function AppSidebar() {
     );
   };
 
+  const groups = isClient
+    ? [{ label: "Área do Cliente", items: CLIENT_NAV }]
+    : NAV_GROUPS.map((g) => ({ ...g, items: g.items.filter(allowed) })).filter(
+        (g) => g.items.length > 0,
+      );
+
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-2">
-          <div className="h-8 w-8 rounded-md bg-primary text-primary-foreground grid place-items-center font-bold">
+        <div className="flex items-center gap-2 px-2 py-3">
+          <div className="h-9 w-9 rounded-[10px] bg-sidebar-primary text-sidebar-primary-foreground grid place-items-center font-serif text-base font-semibold">
             J
           </div>
           {!collapsed && (
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate">JCF Microcrédito</p>
-              <p className="text-xs text-muted-foreground truncate">Admin Platform</p>
+              <p className="text-xs text-sidebar-foreground/60 truncate">
+                {isClient ? "Portal do Cliente" : "Backoffice"}
+              </p>
             </div>
           )}
         </div>
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Área Pessoal</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>{userItems.map(renderItem)}</SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        {visibleOps.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Operação</SidebarGroupLabel>
+        {groups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel className="text-[11px] uppercase tracking-wider">
+              {group.label}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
-              <SidebarMenu>{visibleOps.map(renderItem)}</SidebarMenu>
+              <SidebarMenu>{group.items.map(renderItem)}</SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-        )}
-
-        {visibleGestao.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Gestão</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{visibleGestao.map(renderItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {visibleFin.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Financeiro</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{visibleFin.map(renderItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
-
-        {visibleAdmin.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Administração</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{visibleAdmin.map(renderItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+        ))}
       </SidebarContent>
 
-      {!collapsed && user && (
+      {user && (
         <SidebarFooter className="border-t border-sidebar-border">
-          <div className="px-2 py-2">
-            <p className="text-xs text-muted-foreground">Sessão</p>
-            <p className="text-sm font-medium truncate">{user.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-          </div>
+          {collapsed ? (
+            <div className="px-2 py-2 text-center text-[10px] text-sidebar-foreground/60">
+              {user.role.slice(0, 3)}
+            </div>
+          ) : (
+            <div className="px-2 py-2">
+              <p className="text-sm font-medium truncate">{user.name}</p>
+              <p className="text-xs text-sidebar-foreground/60 truncate">
+                {PERFIL_LABEL[user.role] ?? user.role}
+              </p>
+            </div>
+          )}
         </SidebarFooter>
       )}
     </Sidebar>
